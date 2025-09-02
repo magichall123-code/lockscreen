@@ -1,193 +1,86 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iPhone Lockscreen</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: url('https://i.imgur.com/7kQEsHU.jpg') no-repeat center center fixed;
-      background-size: cover;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPhone Code</title>
 
-    .lockscreen {
-      text-align: center;
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json">
 
-    /* Heure */
-    .time {
-      font-size: 80px;
-      font-weight: 300;
-      margin-top: 100px;
-      margin-bottom: 5px;
-    }
+<!-- iOS full screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="iPhone Code">
 
-    /* Date */
-    .date {
-      font-size: 20px;
-      font-weight: 400;
-      margin-bottom: 40px;
-    }
+<!-- Icône iOS -->
+<link rel="apple-touch-icon" href="icon.png">
 
-    /* Indication PIN */
-    .instruction {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-
-    /* Points PIN */
-    .dots {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-    .dot {
-      width: 15px;
-      height: 15px;
-      margin: 0 8px;
-      border-radius: 50%;
-      border: 2px solid white;
-      background-color: transparent;
-    }
-    .dot.filled {
-      background-color: white;
-    }
-
-    /* Clavier */
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 90px);
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .key {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      font-size: 28px;
-      border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      backdrop-filter: blur(10px);
-    }
-    .key:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    /* Swipe bar en bas */
-    .swipe-up {
-      position: absolute;
-      bottom: 40px;
-      width: 100%;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 14px;
-      opacity: 0.8;
-      animation: fadein 2s infinite alternate;
-    }
-
-    .swipe-bar {
-      width: 120px;
-      height: 5px;
-      background: white;
-      border-radius: 3px;
-      margin-bottom: 8px;
-    }
-
-    @keyframes fadein {
-      from { opacity: 0.4; }
-      to { opacity: 1; }
-    }
-  </style>
+<style>
+body {
+    margin: 0;
+    background-color: black;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.clock {
+    font-size: 60px;
+    font-weight: 200;
+}
+.date {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+.code {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    gap: 15px;
+}
+button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    font-size: 24px;
+}
+</style>
 </head>
 <body>
-  <div class="lockscreen">
-    <div class="time" id="time">12:00</div>
-    <div class="date" id="date">Mardi 2 septembre</div>
 
-    <div class="instruction">Entrez le code</div>
-    <div class="dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
+<div class="clock" id="clock"></div>
+<div class="date" id="date"></div>
 
-    <div class="keypad">
-      <div class="key">1</div>
-      <div class="key">2</div>
-      <div class="key">3</div>
-      <div class="key">4</div>
-      <div class="key">5</div>
-      <div class="key">6</div>
-      <div class="key">7</div>
-      <div class="key">8</div>
-      <div class="key">9</div>
-      <div class="key">←</div>
-      <div class="key">0</div>
-      <div class="key">✔</div>
-    </div>
+<div class="code">
+    <button>1</button><button>2</button><button>3</button>
+    <button>4</button><button>5</button><button>6</button>
+    <button>7</button><button>8</button><button>9</button>
+    <div></div><button>0</button><div></div>
+</div>
 
-    <div class="swipe-up">
-      <div class="swipe-bar"></div>
-      <div>Balayez vers le haut pour déverrouiller</div>
-    </div>
-  </div>
+<script>
+function updateClock() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('clock').textContent = `${hours}:${minutes}`;
 
-  <script>
-    // Affichage heure et date
-    function updateTime() {
-      const now = new Date();
-      const options = { weekday: 'long', day: 'numeric', month: 'long' };
-      document.getElementById("time").textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      document.getElementById("date").textContent = now.toLocaleDateString('fr-FR', options);
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', options);
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-    // Gestion du code PIN
-    const keys = document.querySelectorAll(".key");
-    const dots = document.querySelectorAll(".dot");
-    let input = "";
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
+</script>
 
-    keys.forEach(key => {
-      key.addEventListener("click", () => {
-        const val = key.textContent;
-
-        if(val === "←") {
-          input = input.slice(0, -1);
-        } else if(val === "✔") {
-          alert("Déverrouillé !");
-          input = "";
-        } else if(input.length < 4) {
-          input += val;
-        }
-
-        dots.forEach((dot, i) => {
-          dot.classList.toggle("filled", i < input.length);
-        });
-      });
-    });
-  </script>
 </body>
 </html>
