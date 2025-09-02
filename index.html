@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lockscreen</title>
+  <title>iPhone Lockscreen</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: url('https://i.imgur.com/7kQEsHU.jpg') no-repeat center center fixed;
       background-size: cover;
       margin: 0;
@@ -15,24 +15,48 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: white;
+      overflow: hidden;
     }
+
     .lockscreen {
       text-align: center;
-      color: white;
-      backdrop-filter: blur(6px);
-      padding: 20px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.4);
+      width: 100%;
+      height: 100%;
+      position: relative;
     }
+
+    /* Heure */
+    .time {
+      font-size: 80px;
+      font-weight: 300;
+      margin-top: 100px;
+      margin-bottom: 5px;
+    }
+
+    /* Date */
+    .date {
+      font-size: 20px;
+      font-weight: 400;
+      margin-bottom: 40px;
+    }
+
+    /* Indication PIN */
+    .instruction {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    /* Points PIN */
     .dots {
       display: flex;
       justify-content: center;
-      margin: 15px 0;
+      margin-bottom: 30px;
     }
     .dot {
       width: 15px;
       height: 15px;
-      margin: 0 5px;
+      margin: 0 8px;
       border-radius: 50%;
       border: 2px solid white;
       background-color: transparent;
@@ -40,40 +64,75 @@
     .dot.filled {
       background-color: white;
     }
+
+    /* Clavier */
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 80px);
-      gap: 15px;
+      grid-template-columns: repeat(3, 90px);
+      gap: 20px;
       justify-content: center;
+      margin-top: 20px;
     }
     .key {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       border: 1px solid rgba(255,255,255,0.3);
       color: white;
-      font-size: 24px;
+      font-size: 28px;
       border-radius: 50%;
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
       transition: background 0.2s;
+      backdrop-filter: blur(10px);
     }
     .key:hover {
-      background: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Swipe bar en bas */
+    .swipe-up {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
+      opacity: 0.8;
+      animation: fadein 2s infinite alternate;
+    }
+
+    .swipe-bar {
+      width: 120px;
+      height: 5px;
+      background: white;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
   <div class="lockscreen">
-    <h2>Entrez votre code</h2>
+    <div class="time" id="time">12:00</div>
+    <div class="date" id="date">Mardi 2 septembre</div>
+
+    <div class="instruction">Entrez le code</div>
     <div class="dots">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot"></div>
     </div>
+
     <div class="keypad">
       <div class="key">1</div>
       <div class="key">2</div>
@@ -88,9 +147,25 @@
       <div class="key">0</div>
       <div class="key">✔</div>
     </div>
+
+    <div class="swipe-up">
+      <div class="swipe-bar"></div>
+      <div>Balayez vers le haut pour déverrouiller</div>
+    </div>
   </div>
 
   <script>
+    // Affichage heure et date
+    function updateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', day: 'numeric', month: 'long' };
+      document.getElementById("time").textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById("date").textContent = now.toLocaleDateString('fr-FR', options);
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Gestion du code PIN
     const keys = document.querySelectorAll(".key");
     const dots = document.querySelectorAll(".dot");
     let input = "";
